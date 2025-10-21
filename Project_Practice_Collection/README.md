@@ -1,0 +1,12 @@
+
+# Project_Practice_Collection 폴더 설명
+
+# 홈페이지 제작을 목표로 기능 구현 능력을 키우기 위한 연습 프로젝트 폴더
+- Bank_Ver1 
+    - class, method, 객체, static, 반복문 활용 및 이해
+    - class 와 객체에 대한 이해 부족 및 활용도 부족으로 인해 중단
+- Bank_Ver2
+    - 기존에 이어서 Bank를 만들려고 시도
+    - 기존 보다 static 과 method를 이해했으며 아직 getter, setter 이해부족
+    - 클래스 및 method 기능을 완벽하게 정리 할 필요가 있어 보임.
+    - 파일 저장에 대한 이해 부족, 클래스와 메서드의 정리 부족으로 인해 중단
