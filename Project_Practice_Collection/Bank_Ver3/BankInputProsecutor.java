@@ -46,18 +46,21 @@ public class BankInputProsecutor {
     public static String matchPassward(String promptMessage, String storedPassward){
         try{
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            System.out.println(promptMessage);
             String input;
             for( int i=1; i<4; i++){
-                System.out.println();
+                System.out.println(promptMessage);
                 input = br.readLine();
                 if(storedPassward.equals(input)){
                     return input;
-                }else{
+                }else if(i < 3){
                     BankUtility.clearConsole();
                     System.out.println("입력하신 비밀번호가 다릅니다");
                     System.out.println(i+"번 틀리셨습니다");
-                    System.out.println("3번 틀릴경우 초기 화면으로 돌아갑니다");
+                    System.out.println("3번 틀릴경우 초기 화면으로 돌아갑니다" +"\n");
+                } else {
+                    BankUtility.clearConsole();
+                    System.out.println(i+"번 틀리셨습니다");
+                    System.out.println("초기 화면으로 돌아갑니다");   
                 }
             }
             return "";

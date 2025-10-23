@@ -47,13 +47,8 @@ public class BankNewAccount {
         account = sb.toString();
         setAccount(account);
         setMoney("0");
-        information = 
-        "이름 : " +getName()
-        +" / 주민등록번호 : " +getIdNumberFront() +"-" +getIdNumberBack()
-        +" / 계좌번호 : " +getAccount() 
-        +" / 비밀번호 : " +getPassward() 
-        +" / 잔액 : " +getMoney() +" 원";
-        BankUtility.save(information);
+
+        BankUtility.save(getName(), getIdNumberFront(), getIdNumberBack(), getAccount(), getPassward(), getMoney());
         System.out.println("계좌가 생성되었습니다");
         System.out.println("예금주 : " +getName());
         System.out.println("계좌번호 : " +getAccount());
