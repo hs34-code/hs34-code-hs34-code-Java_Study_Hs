@@ -15,3 +15,6 @@
     - class와 method , getter setter 에 대한 정리가 되어가는중 
     - 람다, 커스텀 클래스에 대한 정보를 얻음, 이해 부족으로 활용 불가
     - 완성후 수정하기 힘들게 짜여졌다고 생각, 메서드 세분화 및 main 정리에 대한 필요성을 느낌
+- Calculator_Swing_Ver1
+    - java로 GUI 구성하는 법
+        - 창 띄우기
