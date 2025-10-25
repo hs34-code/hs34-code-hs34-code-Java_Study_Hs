@@ -4,6 +4,8 @@ JFrame 은 크게 2개
     - 객체 생성     JFrame jr = new JFrame()
     - 상속          class ~ extends JFrame{}
 
+JFrame은 건물전체 JPanel은 건물안의 방
+전체창            창을 구획하는 컨테이너
 
 레이아웃 
     - FlowLayout
@@ -70,3 +72,11 @@ JFrame 은 크게 2개
     여러 옵션중 한가지 선택 
     여러 영역에서 사용될 가능성으로 그룹으로 묶어서 사용(BuutonGroup)
 
+
+이벤트 처리 
+    - 이벤트 리스너 Event Listener
+        이벤트 발생시 이벤트의 정보가 담긴 객체 생성
+        객체에 대응 하여 작성된 이벤트 처리 객체
+        인터페이스 구현 클래스와 이벤트 객체를 연결
+    - 이벤트 핸들러 Event Handler
+        이벤트 리스너에 전달된 이벤트를 실제로 처리하는 메서드
