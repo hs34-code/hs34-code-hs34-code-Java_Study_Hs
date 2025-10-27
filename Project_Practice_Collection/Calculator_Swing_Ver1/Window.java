@@ -2,11 +2,12 @@ package Project_Practice_Collection.Calculator_Swing_Ver1;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import java.awt.*;
+import java.text.DecimalFormat;
+
 
 
 public class Window {
@@ -34,6 +35,9 @@ public class Window {
         settingComponentpOperatorButton();      // bottom 기호 버튼 생성 및 기호 입력   / Component 생성과 동시에 속성 설정
         settingTopomponents();      //top JTextAera 생성 및 폰트, 크기 설정             / Component 생성과 동시에 속성 설정
         
+        settingNumButtonEvent();
+        settingOperatorButtonEvent();
+        
         settingPanel(); // 각 top, bottom 가구들을 각 방에 맞게 추가
 
         frame.add(top);         // top frame 추가           // 집에 위 방 추가
@@ -60,7 +64,7 @@ public class Window {
     private void settingComponentpOperatorButton(){  // 아래 방 가구 생성
         buttonBlank1 = new JButton("");
         buttonBlank2 = new JButton("");
-        buttonRemainder = new JButton("나머지");
+        buttonRemainder = new JButton("나머지(%)");
         buttonDelete = new JButton("< DEL");
 
         buttonParenthesesStrat = new JButton("(");
@@ -79,11 +83,11 @@ public class Window {
     private void settingTopomponents(){ // 위 방 가구 생성 
         textHistoryDisplay = new JTextArea();
         textHistoryDisplay.setFont(new Font("돋움", Font.PLAIN, 20));
-        textHistoryDisplay.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        textHistoryDisplay.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 
         textInputNumbers = new JTextArea("0");
         textInputNumbers.setFont(new Font("돋움", Font.BOLD, 35)); // 글자 크기 및 폰트 지정
-        textInputNumbers.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT); // 오른쪽 - 왼쪽 입력
+        textInputNumbers.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
         textInputNumbers.setEditable(false); // 입력불가
     }
 
@@ -129,12 +133,131 @@ public class Window {
     private void settingNumButtonEvent(){
         for(int i=0; i<10; i++){
             int num = i;
-            buttonNum[i].addActionListener( e -> {
-                String currentText = textInputNumbers.getText();
-                if (currentText.equals("0")){
-                    
+            buttonNum[i].addActionListener( e -> {  //람다 버튼 감지(Listener) -> Event 실행
+                String currentInputText = textInputNumbers.getText();
+                String currentHistoryText = textHistoryDisplay.getText();
+                if (currentInputText.equals("0")) {  //맨 처음 초기값 0 일경우 0없애고 입력된 button 값 추가
+                    textInputNumbers.setText("");
+                    textInputNumbersUpdate(String.valueOf(num));
+                    textHistoryDisplayUpdate(String.valueOf(num));
+                } else if(currentHistoryText.contains("=")){
+                    textHistoryDisplay.setText("");
+                    textHistoryDisplay.setText(String.valueOf(num));
+                    textInputNumbers.setText(String.valueOf(num));
+                } else {
+                    textInputNumbers.setText(currentInputText + num); // string+int 만날시 자동으로 string 변경 따라서 valueof 생략
+                    textHistoryDisplayUpdate(String.valueOf(num));
                 }
             });
         }
+    }
+
+    private void settingOperatorButtonEvent(){
+        buttonRemainder.addActionListener(
+            e -> {
+                isOperator("%");
+            }
+        );
+
+        buttonDivide.addActionListener(
+            e -> {
+                isOperator("/");
+            }
+        );
+
+        buttonMultiplication.addActionListener(
+            e -> {
+                isOperator("*");
+            }
+        );
+
+        buttonSubtraction.addActionListener(
+            e -> {
+                isOperator("-");
+            }
+        );
+        
+        buttonAddition.addActionListener(
+            e -> {
+                isOperator("+");
+            }
+        );
+        buttonDelete.addActionListener(
+            e -> {
+                String input = textInputNumbers.getText();
+                String history = textHistoryDisplay.getText();
+                if(!textInputNumbers.equals(0) && !input.isEmpty() && !history.isEmpty()){
+                    textInputNumbers.setText(input.substring(0, input.length()-1));
+                    textHistoryDisplay.setText(history.substring(0, history.length()-1));                       
+                } 
+            }
+        );
+
+        // buttonParenthesesStrat
+        // buttonParenthesesEnd
+        
+        // buttonSignChange
+        buttonDecimal.addActionListener(
+            e -> {
+                String history = textHistoryDisplay.getText();
+                String input = textInputNumbers.getText();
+                if(history.isEmpty() && input.equals("0")){
+                    textHistoryDisplayUpdate("0.");
+                    textInputNumbersUpdate(".");
+                } else if(history.charAt(history.length()-1) != '.' && input.charAt(input.length()-1) != '.') {
+                    textHistoryDisplayUpdate(".");
+                    textInputNumbersUpdate(".");
+                } else if(history.equals("0.") && input.equals("0.")){
+                    textHistoryDisplay.setText("");
+                    textInputNumbers.setText("0");
+                } else {
+                    textHistoryDisplay.setText(history.substring(0, history.length()-1));
+                    textInputNumbers.setText(input.substring(0, input.length()-1));
+                }
+            }
+        );
+        buttonResult.addActionListener(
+            e -> {
+                isOperator("=");
+                String history = textHistoryDisplay.getText();
+                double result = Calculator.CalculatorFunction(history);
+                if (result == (long)result){
+                    textInputNumbers.setText(String.format( "%d", (long)result));
+                } else {
+                    DecimalFormat df = new DecimalFormat("0.########");
+                    textInputNumbers.setText(result +"...");
+                }
+            }
+        );
+
+        buttonClear.addActionListener(
+            e -> {
+                textHistoryDisplay.setText("");
+                textInputNumbers.setText("0");
+            }
+        );
+    }
+
+    private void isOperator(String operator){
+        String history = textHistoryDisplay.getText();
+        if(!history.isEmpty()){
+            char c = history.charAt(history.length()-1);
+            if(c == '+' || c == '-' || c == 'x' || c =='÷' || c=='%' || c == '='){
+                textHistoryDisplay.setText(history.substring(0, history.length()-1));
+                textHistoryDisplayUpdate(operator);
+            } else{
+                textHistoryDisplayUpdate(operator);
+            }
+        }
+    }
+
+    private void textHistoryDisplayUpdate(String input){
+        String current = textHistoryDisplay.getText();
+        textHistoryDisplay.setText(current +input);
+    }
+
+    private void textInputNumbersUpdate(String input){
+        String current = textInputNumbers.getText();
+        textInputNumbers.setText(current +input);
     }
 }
