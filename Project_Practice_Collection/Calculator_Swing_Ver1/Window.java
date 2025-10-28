@@ -1,12 +1,15 @@
 package Project_Practice_Collection.Calculator_Swing_Ver1;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import java.awt.*;
-import java.text.DecimalFormat;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 
 
 
@@ -22,9 +25,9 @@ public class Window {
     // Bottom Panel
     JButton[] buttonNum = new JButton[10]; // 아래 방에 이런 가구를 들여놓을 예정
     
-    JButton buttonBlank1, buttonBlank2, buttonRemainder, buttonDelete;
+    JButton blank, buttonRemainder, buttonDelete;
     JButton buttonParenthesesStrat, buttonParenthesesEnd, buttonClear, buttonDivide;
-    JButton buttonMultiplication, buttonSubtraction,buttonAddition, buttonSignChange, buttonDecimal, buttonResult;
+    JButton buttonMultiplication, buttonSubtraction,buttonAddition, buttonDecimal, buttonResult;
  
     public Window(){
         frame.setBounds(800, 200, 350 , 570); // 크기 설정
@@ -55,16 +58,30 @@ public class Window {
         */
     }
 
-    private void settingComponentNumButton(){ // 아래 방 가구 생성
+    JButton createBlankButton() { // 비어있는 버튼 생성
+        blank = new JButton("");
+        blank.setEnabled(false);
+        buttonStyle(blank);
+        return blank;
+    }
+
+    private void buttonStyle(JButton button){
+        button.setBorderPainted(true);
+        button.setFocusPainted(false);
+        button.setContentAreaFilled(true);
+        button.setBackground(new Color(230,230,230));
+        button.setFont(new Font("맑은 고딕", Font.BOLD, 13));
+    }
+
+    private void settingComponentNumButton(){ // 아래 방 숫자 가구 생성
         for(int i=0; i<10; i++){
             buttonNum[i] = new JButton(""+i);
+            buttonStyle(buttonNum[i]);
         }
     }
 
-    private void settingComponentpOperatorButton(){  // 아래 방 가구 생성
-        buttonBlank1 = new JButton("");
-        buttonBlank2 = new JButton("");
-        buttonRemainder = new JButton("나머지(%)");
+    private void settingComponentpOperatorButton(){  // 아래 방 기호 가구 생성
+        buttonRemainder = new JButton("나머지%");
         buttonDelete = new JButton("< DEL");
 
         buttonParenthesesStrat = new JButton("(");
@@ -75,9 +92,23 @@ public class Window {
         buttonMultiplication = new JButton("x");
         buttonSubtraction = new JButton("-");
         buttonAddition = new JButton("+");
-        buttonSignChange = new JButton("+/- ");
         buttonDecimal = new JButton(".");
         buttonResult = new JButton("=");
+
+        buttonStyle(buttonRemainder);
+        buttonStyle(buttonDelete);
+
+        buttonStyle(buttonParenthesesStrat);
+        buttonStyle(buttonParenthesesEnd);
+        buttonStyle(buttonClear);
+        buttonStyle(buttonDivide);
+
+        buttonStyle(buttonMultiplication);
+        buttonStyle(buttonSubtraction);
+        buttonStyle(buttonAddition);
+        buttonStyle(buttonDecimal);
+        buttonStyle(buttonResult);
+
     }
 
     private void settingTopomponents(){ // 위 방 가구 생성 
@@ -99,8 +130,8 @@ public class Window {
 
         // botto
         bottom.setLayout(new GridLayout(6,4));
-        bottom.add(buttonBlank1);
-        bottom.add(buttonBlank2);
+        bottom.add(createBlankButton());
+        bottom.add(createBlankButton());
         bottom.add(buttonRemainder);
         bottom.add(buttonDelete);
 
@@ -124,12 +155,13 @@ public class Window {
         bottom.add(buttonNum[3]);
         bottom.add(buttonAddition);
 
-        bottom.add(buttonSignChange);
+        bottom.add(createBlankButton());
         bottom.add(buttonNum[0]);
         bottom.add(buttonDecimal);
         bottom.add(buttonResult);
     }
 
+    // event 
     private void settingNumButtonEvent(){
         for(int i=0; i<10; i++){
             int num = i;
@@ -156,30 +188,35 @@ public class Window {
         buttonRemainder.addActionListener(
             e -> {
                 isOperator("%");
+                textInputNumbers.setText("");
             }
         );
 
         buttonDivide.addActionListener(
             e -> {
-                isOperator("/");
+                isOperator("÷");
+                textInputNumbers.setText("");
             }
         );
 
         buttonMultiplication.addActionListener(
             e -> {
-                isOperator("*");
+                isOperator("x");
+                textInputNumbers.setText("");
             }
         );
 
         buttonSubtraction.addActionListener(
             e -> {
                 isOperator("-");
+                textInputNumbers.setText("");
             }
         );
         
         buttonAddition.addActionListener(
             e -> {
                 isOperator("+");
+                textInputNumbers.setText("");
             }
         );
         buttonDelete.addActionListener(
@@ -193,10 +230,29 @@ public class Window {
             }
         );
 
-        // buttonParenthesesStrat
-        // buttonParenthesesEnd
+        buttonParenthesesStrat.addActionListener(
+            e -> {
+                textHistoryDisplayUpdate("(");
+            }
+        );
+        buttonParenthesesEnd.addActionListener(
+            e ->{
+                String history = textHistoryDisplay.getText();
+                int openCount = 0;
+                for(char c : history.toCharArray()){
+                    if (c == '(') openCount++;
+                }
+                int closeCount = 0;
+                for(char c : history.toCharArray()){
+                    if (c == ')') closeCount++;
+                }
+                if (openCount > closeCount){
+                    isOperator(")");
+                }
+            }
+        );
         
-        // buttonSignChange
+
         buttonDecimal.addActionListener(
             e -> {
                 String history = textHistoryDisplay.getText();
@@ -216,16 +272,43 @@ public class Window {
                 }
             }
         );
+
         buttonResult.addActionListener(
             e -> {
-                isOperator("=");
                 String history = textHistoryDisplay.getText();
+                int openCount = 0;
+                for(char c : history.toCharArray()){
+                    if (c == '(') openCount++;
+                }
+                int closeCount = 0;
+                for(char c : history.toCharArray()){
+                    if (c == ')') closeCount++;
+                }
+                if(openCount != closeCount){
+                    int miss = openCount -closeCount;
+                    for (int i=0; i<miss; i++){
+                        textHistoryDisplayUpdate(")");
+                    }
+                }
+                isOperator("=");
+                history = textHistoryDisplay.getText();
                 double result = Calculator.CalculatorFunction(history);
-                if (result == (long)result){
+                if(result % 1 == 0){
                     textInputNumbers.setText(String.format( "%d", (long)result));
                 } else {
-                    DecimalFormat df = new DecimalFormat("0.########");
-                    textInputNumbers.setText(result +"...");
+                    BigDecimal bd = new BigDecimal(result);
+                    int scale = Math.max(0, bd.stripTrailingZeros().scale());
+                               // 음수여도 최소값을 0  // 뒤에 불필요한 0 제거, 그후 소수점 자리수 반환
+                    if(scale <= 6 ){
+                        textInputNumbers.setText(bd.stripTrailingZeros().toPlainString());
+                                                // 뒤에 불필요한 0 제거, 지수표기 없이 출력 1e-4
+                    }
+                    else{
+                        BigDecimal rounded = bd.setScale(6, RoundingMode.HALF_UP);
+                                            // 소수점 6자리까지 맞추기 , 반올림
+                        textInputNumbers.setText(rounded.toPlainString() + "...");
+                                            // 그후 ... 붙이기
+                    }
                 }
             }
         );
@@ -238,16 +321,22 @@ public class Window {
         );
     }
 
+    // event 기능
     private void isOperator(String operator){
         String history = textHistoryDisplay.getText();
+        String input = textInputNumbers.getText();
         if(!history.isEmpty()){
             char c = history.charAt(history.length()-1);
-            if(c == '+' || c == '-' || c == 'x' || c =='÷' || c=='%' || c == '='){
+            if(c == '+' || c == '-' || c=='%' || c == '=' || c == 'x' || c == '÷' ){
                 textHistoryDisplay.setText(history.substring(0, history.length()-1));
                 textHistoryDisplayUpdate(operator);
-            } else{
+            } else if (c == '('){
+                textHistoryDisplayUpdate( "0" +operator);
+            } else {
                 textHistoryDisplayUpdate(operator);
             }
+        } else if(input .equals("0")){
+            textHistoryDisplayUpdate( "0" +operator);
         }
     }
 
